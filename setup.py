@@ -1,7 +1,5 @@
 import os.path as osp
 from setuptools import setup, find_packages
-from distutils.extension import Extension
-from Cython.Build import cythonize
 
 def readme():
     with open('README.md') as f:
@@ -13,8 +11,16 @@ def get_requirements(filename='requirements.txt'):
         return [line.strip() for line in f.readlines()]
 
 def build_ext_modules():
-    # ここで初めて numpy を import する
+    # ここで初めて numpy と Cython を import する
     import numpy as np
+
+    try:
+        from Cython.Build import cythonize
+        from distutils.extension import Extension
+    except ImportError:
+        # Cython が見つからない場合は、代わりに拡張モジュール無しでビルドできるようにする
+        print("Warning: Cython is not installed. Some extensions will not be compiled.")
+        return []
 
     def numpy_include():
         try:
@@ -29,7 +35,6 @@ def build_ext_modules():
             include_dirs=[numpy_include()],
         )
     ]
-    # 必要ならオプションを追加
     return cythonize(ext_modules)
 
 setup(
@@ -42,6 +47,5 @@ setup(
     install_requires=get_requirements(),
     extras_require={"labels": get_requirements("requirements_labels.txt")},
     keywords=["Person Re-Identification", "Deep Learning", "Computer Vision"],
-    # ext_modules をビルド時に初めて呼ぶ
     ext_modules=build_ext_modules()
 )
