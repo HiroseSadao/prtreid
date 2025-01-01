@@ -2,12 +2,13 @@ import os.path as osp
 from setuptools import setup, find_packages
 
 def readme():
-    with open('README.md') as f:
+    # --- 修正ポイント: encoding を明示 ---
+    with open('README.md', 'r', encoding='utf-8') as f:
         return f.read()
 
 def get_requirements(filename='requirements.txt'):
     here = osp.dirname(osp.realpath(__file__))
-    with open(osp.join(here, filename), 'r') as f:
+    with open(osp.join(here, filename), 'r', encoding='utf-8') as f:
         return [line.strip() for line in f.readlines()]
 
 def build_ext_modules():
